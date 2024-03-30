@@ -14,19 +14,26 @@ const C_Select = (function() {
             // Close the dropdown if the user clicks outside of it
             closeAllLists(evt.target);
 
-            // 
+            // Check for button closures in multiple drop down lists. 
             if (evt.target.classList.contains('cselect-button-close')) {
-
+                // Get the button.
+                const button = document.getElementById('cselect-button-' + evt.target.dataset.idNumber);
+                // Deselect the corresponding option in the actual select.
+                const select = getSelect(button);
+                select.querySelector('option[value=' + evt.target.dataset.value + ']').removeAttribute('selected');
+                // Then remove the button from the selected area.
+                button.remove();
             }
         });
 
         function createCSelect(select, cselectId) {
             // 
-            if (select.tagName == 'SELECT') {
+            if (select.tagName == 'SELECT' && select.hasAttribute('name')) {
                 const cselect = document.createElement('div');
                 cselect.setAttribute('class', 'cselect-container');
                 cselect.setAttribute('id', 'cselect-container-' + cselectId);
-                cselect.setAttribute('data-name', select.name);
+                // The name of the actual select.
+                cselect.setAttribute('data-select-name', select.name);
                 cselect.setAttribute('data-id-number', cselectId);
                 //cselect.setAttribute('style', 'width: 200px;');
 
@@ -56,7 +63,8 @@ const C_Select = (function() {
                     option.setAttribute('data-id-number', j);
                     option.setAttribute('class', 'cselect-item');
 
-                    if (j == select.selectedIndex) {
+                    //if (j == select.selectedIndex) {
+                    if (select.options[j].selected) {
                         option.setAttribute('class', 'cselect-item-selected');
                         option.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + j);
                     }
@@ -65,14 +73,19 @@ const C_Select = (function() {
                     option.appendChild(text);
                     itemContainer.appendChild(option);
 
-                    // Set the selected value and close the dropdown when an option is clicked
+                    // Set the selected value and close the dropdown when an item is clicked
                     option.addEventListener('click', function() {
-                        if (select.hasAttribute('multiple')) {
+                        // Don't treat the items already selected.
+                        if (this.classList.contains('cselect-item-selected')) {
+                            return;
+                        }
 
+                        if (select.hasAttribute('multiple')) {
+                            updateSelectedMultiple(cselectId, this);
                         }
                         // Standard drop down list.
                         else {
-                            shiftSelected(cselectId, this);
+                            updateSelected(cselectId, this);
                         }
                     });
                 }
@@ -100,13 +113,16 @@ const C_Select = (function() {
             // Loop through the options of the original select.
             for (let j = 0; j < select.options.length; j++) {
                 if (select.options[j].selected) {
-                    console.log(select.options[j].text);
+                    // Create a button for the selected item.
                     const selectedItem = document.createElement('div');
                     selectedItem.setAttribute('class', 'cselect-button');
+                    selectedItem.setAttribute('id', 'cselect-button-' + j);
+                    // Create the button label.
                     const label = document.createElement('span');
                     label.setAttribute('class', 'cselect-button-label');
                     let text = document.createTextNode(select.options[j].text);
                     label.appendChild(text);
+                    // Create the button closure.
                     const close = document.createElement('span');
                     close.setAttribute('class', 'cselect-button-close');
                     close.setAttribute('data-id-number', j);
@@ -121,26 +137,66 @@ const C_Select = (function() {
             }
         }
 
-        function shiftSelected(id, newSelected) {
-            const selected = document.getElementById('cselect-selected-' + id);
-            selected.innerHTML = newSelected.innerHTML;
+        function createSelectedItemMultiple(select, idNumber) {
 
-            //const oldSelected = document.getElementById('cselect-item-selected-' + id);
-            const oldSelected = document.querySelectorAll('[id^="cselect-item-selected-'+ id +'"]')[0];
-            oldSelected.classList.remove('cselect-item-selected');
-            oldSelected.classList.add('cselect-item');
-            oldSelected.removeAttribute('id');
+        }
 
-            newSelected.classList.add('cselect-item-selected');
-            newSelected.setAttribute('id', 'cselect-item-selected-' + id + '-' + newSelected.dataset.idNumber);
+        function updateSelected(cselectId, newSelectedItem) {
+            const selected = document.getElementById('cselect-selected-' + cselectId);
+            selected.innerHTML = newSelectedItem.innerHTML;
 
-            const itemContainer = document.getElementById('cselect-item-container-' + id);
+            const oldSelectedItem = document.querySelectorAll('[id^="cselect-item-selected-'+ cselectId +'"]')[0];
+            oldSelectedItem.classList.remove('cselect-item-selected');
+            oldSelectedItem.classList.add('cselect-item');
+            oldSelectedItem.removeAttribute('id');
+
+            newSelectedItem.classList.add('cselect-item-selected');
+            newSelectedItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + newSelectedItem.dataset.idNumber);
+
+            const itemContainer = document.getElementById('cselect-item-container-' + cselectId);
             itemContainer.style.display = 'none';
 
-            const cselect = document.getElementById('cselect-container-' + id);
-            const select = document.getElementsByName(cselect.dataset.name)[0];
+            // Update the selected option in the actual select.
+            const select = getSelect(newSelectedItem);
             select.options[select.selectedIndex].removeAttribute('selected');
-            select.options[newSelected.dataset.idNumber].setAttribute('selected', 'selected');
+            select.options[newSelectedItem.dataset.idNumber].setAttribute('selected', 'selected');
+        }
+
+        function updateSelectedMultiple(cselectId, newSelectedItem) {
+            // Update the selection in the actual select multiple.
+            const select = getSelect(newSelectedItem);
+            select.options[newSelectedItem.dataset.idNumber].setAttribute('selected', 'selected');
+
+        }
+
+        /*
+         *  Returns the name of the actual select for a given element.
+         */
+        function getSelectName(elem) {
+            if (elem.classList.contains('cselect-selected') || elem.classList.contains('cselect-item-container')) {
+                // The CSelect main container is the parent of the element.
+                return elem.parentElement.dataset.selectName;
+            }
+
+            if (elem.classList.contains('cselect-button') || elem.classList.contains('cselect-item')) {
+                // The CSelect main container is the parent's parent of the element.
+                return elem.parentElement.parentElement.dataset.selectName;
+            }
+
+            return null;
+        }
+
+        /*
+         *  Returns the actual select element for a given element.
+         */
+        function getSelect(elem) {
+            const selectName = getSelectName(elem);
+
+            if (selectName !== null) {
+                return document.getElementsByName(selectName)[0];
+            }
+
+            return null;
         }
 
         function closeAllLists(elem) {
