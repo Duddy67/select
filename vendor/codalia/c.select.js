@@ -3,10 +3,13 @@ const C_Select = (function() {
 
     document.addEventListener('DOMContentLoaded', () => {
 
+        // Get all the initial select tags with a cselect class.
         const selects = document.getElementsByClassName('cselect');
 
+        // Create a CSelect drop down list item for each actual select tag.
         for (let i = 0; i < selects.length; i++) {
             const select = selects[i];
+            // Use i as cselect id.
             createCSelect(select, i);
         }
 
@@ -14,21 +17,32 @@ const C_Select = (function() {
             // Close the dropdown if the user clicks outside of it
             closeAllLists(evt.target);
 
-            // Check for button closures in multiple drop down lists. 
+            // Check for button closure in a multiple drop down list. 
             if (evt.target.classList.contains('cselect-button-close')) {
-                // Get the button.
+                // Get the button from the button closure span.
                 const button = document.getElementById('cselect-button-' + evt.target.dataset.idNumber);
-                // Deselect the corresponding option in the actual select.
+                // Get the cselect id from the cselect container (ie: the parent's parent of the button).
+                const cselectId = button.parentElement.parentElement.dataset.idNumber;
+
+                // Set the attribute and class of the unselected item.
+                const unselectedItem = document.getElementById('cselect-item-selected-' + cselectId + '-' + evt.target.dataset.idNumber);
+                unselectedItem.classList.remove('cselect-item-selected');
+                unselectedItem.classList.add('cselect-item');
+                unselectedItem.removeAttribute('id');
+
+                // Unselect the corresponding option in the actual select.
                 const select = getSelect(button);
                 select.querySelector('option[value=' + evt.target.dataset.value + ']').removeAttribute('selected');
+
                 // Then remove the button from the selected area.
                 button.remove();
             }
         });
 
         function createCSelect(select, cselectId) {
-            // 
+            // Make sure the tag is a select and has a name attribute. 
             if (select.tagName == 'SELECT' && select.hasAttribute('name')) {
+                // Build the CSelect drop down list container.
                 const cselect = document.createElement('div');
                 cselect.setAttribute('class', 'cselect-container');
                 cselect.setAttribute('id', 'cselect-container-' + cselectId);
@@ -37,19 +51,26 @@ const C_Select = (function() {
                 cselect.setAttribute('data-id-number', cselectId);
                 //cselect.setAttribute('style', 'width: 200px;');
 
-                const selected = document.createElement('div');
-                selected.setAttribute('class', 'cselect-selected');
-                selected.setAttribute('id', 'cselect-selected-' + cselectId);
+                // Build the selection area.
+                const selection = document.createElement('div');
+                selection.setAttribute('class', 'cselect-selection');
+                selection.setAttribute('id', 'cselect-selection-' + cselectId);
 
                 if (select.hasAttribute('multiple')) {
-                    createSelectedMultiple(select, selected, cselectId);
+                    // Create a button for each selected option (if any) and put them in the selection area.
+                    for (let i = 0; i < select.options.length; i++) {
+                        if (select.options[i].selected) {
+                            const buttonItem = createButtonItem(select, i);
+                            selection.appendChild(buttonItem);
+                        }   
+                    }
                 }
                 else {
                     const text = document.createTextNode(select.options[select.selectedIndex].text);
-                    selected.appendChild(text);
+                    selection.appendChild(text);
                 }
 
-                cselect.appendChild(selected);
+                cselect.appendChild(selection);
 
                 const itemContainer = document.createElement('div');
                 itemContainer.setAttribute('class', 'cselect-item-container');
@@ -58,23 +79,23 @@ const C_Select = (function() {
 
                 for (let j = 0; j < optionNb; j++) {
 
-                    const option = document.createElement('div');
-                    option.setAttribute('data-value', select.options[j].value);
-                    option.setAttribute('data-id-number', j);
-                    option.setAttribute('class', 'cselect-item');
+                    const optionItem = document.createElement('div');
+                    optionItem.setAttribute('data-value', select.options[j].value);
+                    optionItem.setAttribute('data-id-number', j);
+                    optionItem.setAttribute('class', 'cselect-item');
 
                     //if (j == select.selectedIndex) {
                     if (select.options[j].selected) {
-                        option.setAttribute('class', 'cselect-item-selected');
-                        option.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + j);
+                        optionItem.setAttribute('class', 'cselect-item-selected');
+                        optionItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + j);
                     }
 
                     const text = document.createTextNode(select.options[j].text);
-                    option.appendChild(text);
-                    itemContainer.appendChild(option);
+                    optionItem.appendChild(text);
+                    itemContainer.appendChild(optionItem);
 
-                    // Set the selected value and close the dropdown when an item is clicked
-                    option.addEventListener('click', function() {
+                    // Set the selected value and close the dropdown when an option item is clicked
+                    optionItem.addEventListener('click', function() {
                         // Don't treat the items already selected.
                         if (this.classList.contains('cselect-item-selected')) {
                             return;
@@ -93,7 +114,7 @@ const C_Select = (function() {
                 cselect.appendChild(itemContainer);
 
                 // Toggle the dropdown when the cselect select is clicked
-                selected.addEventListener('click', function() {
+                selection.addEventListener('click', function() {
                     if (itemContainer.style.display === 'block') {
                         itemContainer.style.display = 'none';
                     }
@@ -106,44 +127,32 @@ const C_Select = (function() {
             }
         }
 
-        /*
-         * Create a button area for multiple selections.
-         */
-        function createSelectedMultiple(select, selected, cselectId) {
-            // Loop through the options of the original select.
-            for (let j = 0; j < select.options.length; j++) {
-                if (select.options[j].selected) {
-                    // Create a button for the selected item.
-                    const selectedItem = document.createElement('div');
-                    selectedItem.setAttribute('class', 'cselect-button');
-                    selectedItem.setAttribute('id', 'cselect-button-' + j);
-                    // Create the button label.
-                    const label = document.createElement('span');
-                    label.setAttribute('class', 'cselect-button-label');
-                    let text = document.createTextNode(select.options[j].text);
-                    label.appendChild(text);
-                    // Create the button closure.
-                    const close = document.createElement('span');
-                    close.setAttribute('class', 'cselect-button-close');
-                    close.setAttribute('data-id-number', j);
-                    close.setAttribute('data-value', select.options[j].value);
-                    text = document.createTextNode('x');
-                    close.appendChild(text);
-                    selectedItem.appendChild(close);
-                    selectedItem.appendChild(label);
+        function createButtonItem(select, idNumber) {
+            // Create a button for the selected item.
+            const buttonItem = document.createElement('div');
+            buttonItem.setAttribute('class', 'cselect-button');
+            buttonItem.setAttribute('id', 'cselect-button-' + idNumber);
+            // Create the button label.
+            const label = document.createElement('span');
+            label.setAttribute('class', 'cselect-button-label');
+            let text = document.createTextNode(select.options[idNumber].text);
+            label.appendChild(text);
+            // Create the button closure.
+            const close = document.createElement('span');
+            close.setAttribute('class', 'cselect-button-close');
+            close.setAttribute('data-id-number', idNumber);
+            close.setAttribute('data-value', select.options[idNumber].value);
+            text = document.createTextNode('x');
+            close.appendChild(text);
+            buttonItem.appendChild(close);
+            buttonItem.appendChild(label);
 
-                    selected.appendChild(selectedItem);
-                }   
-            }
-        }
-
-        function createSelectedItemMultiple(select, idNumber) {
-
+            return buttonItem;
         }
 
         function updateSelected(cselectId, newSelectedItem) {
-            const selected = document.getElementById('cselect-selected-' + cselectId);
-            selected.innerHTML = newSelectedItem.innerHTML;
+            const selection = document.getElementById('cselect-selection-' + cselectId);
+            selection.innerHTML = newSelectedItem.innerHTML;
 
             const oldSelectedItem = document.querySelectorAll('[id^="cselect-item-selected-'+ cselectId +'"]')[0];
             oldSelectedItem.classList.remove('cselect-item-selected');
@@ -167,13 +176,30 @@ const C_Select = (function() {
             const select = getSelect(newSelectedItem);
             select.options[newSelectedItem.dataset.idNumber].setAttribute('selected', 'selected');
 
+            // Add the corresponding button item in the selection area.
+            const selection = document.getElementById('cselect-selection-' + cselectId);
+            const buttonItem = createButtonItem(select, newSelectedItem.dataset.idNumber);
+            selection.appendChild(buttonItem);
+
+            // Get the items in the item container.
+            const items = document.getElementById('cselect-item-container-' + cselectId).childNodes;
+
+            // Loop through the items
+            for (let i = 0; i < items.length; i++) {
+                // Set the attributes of the newly selected item.
+                if (items[i].dataset.idNumber == newSelectedItem.dataset.idNumber) {
+                    items[i].classList.remove('cselect-item');
+                    items[i].classList.add('cselect-item-selected');
+                    items[i].setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + newSelectedItem.dataset.idNumber);
+                }
+            }
         }
 
         /*
          *  Returns the name of the actual select for a given element.
          */
         function getSelectName(elem) {
-            if (elem.classList.contains('cselect-selected') || elem.classList.contains('cselect-item-container')) {
+            if (elem.classList.contains('cselect-selection') || elem.classList.contains('cselect-item-container')) {
                 // The CSelect main container is the parent of the element.
                 return elem.parentElement.dataset.selectName;
             }
@@ -205,10 +231,10 @@ const C_Select = (function() {
 
             for (let i = 0; i < cselects.length; i++) {
                 const idNb = cselects[i].dataset.idNumber;
-                const selected = document.getElementById('cselect-selected-' + idNb);
+                const selection = document.getElementById('cselect-selection-' + idNb);
                 const itemContainer = document.getElementById('cselect-item-container-' + idNb);
 
-                if (elem != selected && elem != itemContainer) {
+                if (elem != selection && elem != itemContainer) {
                     itemContainer.style.display = 'none';
                 }
             }

@@ -8,13 +8,13 @@
     border-radius: 4px;
 }
 
-.cselect-selected {
+.cselect-selection {
     background-color: #f1f1f1;
     padding: 8px 16px;
     border-radius: 4px;
 }
 
-.cselect-selected:after {
+.cselect-selection:after {
     content: '';
     float: right;
     margin-top: 15px;
