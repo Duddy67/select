@@ -82,6 +82,12 @@ const C_Select = (function() {
                 itemContainer.setAttribute('class', 'cselect-item-container');
                 itemContainer.setAttribute('id', 'cselect-item-container-' + cselectId);
 
+                const search = document.createElement('input');
+                search.setAttribute('class', 'cselect-search');
+                search.setAttribute('id', 'cselect-search-' + cselectId);
+                search.setAttribute('type', 'text');
+                itemContainer.appendChild(search);
+
                 const optionNb = select.options.length;
 
                 // Loop through the options of the actual select and create the corresponding items.
@@ -122,7 +128,31 @@ const C_Select = (function() {
 
                 cselect.appendChild(itemContainer);
 
-                // Toggle the dropdown when the cselect select is clicked
+                // Filter option items based on user input.
+                search.addEventListener('input', function() {
+                    const filter = this.value.toUpperCase();
+
+                    // Get the option items in the item container.
+                    const items = itemContainer.childNodes;
+
+                    for (let i = 0; i < items.length; i++) {
+                        // Skip the search input element which is the first item in the item container.
+                        if (i == 0) {
+                            continue;
+                        }
+
+                        const itemText = items[i].innerHTML.toUpperCase();
+
+                        if (itemText.indexOf(filter) > -1) {
+                            items[i].style.display = '';
+                        }
+                        else {
+                            items[i].style.display = 'none';
+                        }
+                    }
+                });
+
+                // Toggle the dropdown when the selection is clicked
                 selection.addEventListener('click', function() {
                     if (itemContainer.style.display === 'block') {
                         itemContainer.style.display = 'none';
@@ -256,9 +286,10 @@ const C_Select = (function() {
             for (let i = 0; i < cselects.length; i++) {
                 const idNb = cselects[i].dataset.idNumber;
                 const selection = document.getElementById('cselect-selection-' + idNb);
+                const search = document.getElementById('cselect-search-' + idNb);
                 const itemContainer = document.getElementById('cselect-item-container-' + idNb);
 
-                if (elem != selection && elem != itemContainer) {
+                if (elem != selection && elem != itemContainer && elem != search) {
                     itemContainer.style.display = 'none';
                 }
             }
