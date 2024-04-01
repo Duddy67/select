@@ -39,6 +39,9 @@ const C_Select = (function() {
             }
         });
 
+        /*
+         * Create a CSelect drop down list.
+         */
         function createCSelect(select, cselectId) {
             // Make sure the tag is a select and has a name attribute. 
             if (select.tagName == 'SELECT' && select.hasAttribute('name')) {
@@ -49,25 +52,28 @@ const C_Select = (function() {
                 // The name of the actual select.
                 cselect.setAttribute('data-select-name', select.name);
                 cselect.setAttribute('data-id-number', cselectId);
-                //cselect.setAttribute('style', 'width: 200px;');
 
                 // Build the selection area.
                 const selection = document.createElement('div');
-                selection.setAttribute('class', 'cselect-selection');
                 selection.setAttribute('id', 'cselect-selection-' + cselectId);
+                selection.setAttribute('class', 'cselect-selection');
 
                 if (select.hasAttribute('multiple')) {
-                    // Create a button for each selected option (if any) and put them in the selection area.
+                    // Create a button for each selected option (if any) and put them into the selection area.
                     for (let i = 0; i < select.options.length; i++) {
                         if (select.options[i].selected) {
                             const buttonItem = createButtonItem(select, i);
                             selection.appendChild(buttonItem);
                         }   
                     }
+
+                    selection.classList.add('cselect-multiple');
                 }
                 else {
                     const text = document.createTextNode(select.options[select.selectedIndex].text);
                     selection.appendChild(text);
+                    // Regular drop down lists need a selector icon.
+                    selection.classList.add('cselect-selector');
                 }
 
                 cselect.appendChild(selection);
@@ -75,8 +81,10 @@ const C_Select = (function() {
                 const itemContainer = document.createElement('div');
                 itemContainer.setAttribute('class', 'cselect-item-container');
                 itemContainer.setAttribute('id', 'cselect-item-container-' + cselectId);
+
                 const optionNb = select.options.length;
 
+                // Loop through the options of the actual select and create the corresponding items.
                 for (let j = 0; j < optionNb; j++) {
 
                     const optionItem = document.createElement('div');
@@ -84,9 +92,10 @@ const C_Select = (function() {
                     optionItem.setAttribute('data-id-number', j);
                     optionItem.setAttribute('class', 'cselect-item');
 
-                    //if (j == select.selectedIndex) {
+                    // Check for selected options.
                     if (select.options[j].selected) {
                         optionItem.setAttribute('class', 'cselect-item-selected');
+                        // Use 2 ids in case of multiple select.
                         optionItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + j);
                     }
 
@@ -123,20 +132,26 @@ const C_Select = (function() {
                     }
                 });
 
+                // Insert the newly created CSelect after the actual select.
                 select.insertAdjacentElement('afterend', cselect);
             }
         }
 
+        /*
+         * Create a button for a given selected option. Use with multiple selection.
+         */
         function createButtonItem(select, idNumber) {
             // Create a button for the selected item.
             const buttonItem = document.createElement('div');
             buttonItem.setAttribute('class', 'cselect-button');
             buttonItem.setAttribute('id', 'cselect-button-' + idNumber);
+
             // Create the button label.
             const label = document.createElement('span');
             label.setAttribute('class', 'cselect-button-label');
             let text = document.createTextNode(select.options[idNumber].text);
             label.appendChild(text);
+
             // Create the button closure.
             const close = document.createElement('span');
             close.setAttribute('class', 'cselect-button-close');
@@ -150,18 +165,24 @@ const C_Select = (function() {
             return buttonItem;
         }
 
+        /*
+         * Updates the selection in a regular drop down list.
+         */
         function updateSelected(cselectId, newSelectedItem) {
+            // Set the text of the newly selected option in the selection area.
             const selection = document.getElementById('cselect-selection-' + cselectId);
             selection.innerHTML = newSelectedItem.innerHTML;
+
+            // Switch the class and attribute setting between the previously selected item to the newly selected one.
 
             const oldSelectedItem = document.querySelectorAll('[id^="cselect-item-selected-'+ cselectId +'"]')[0];
             oldSelectedItem.classList.remove('cselect-item-selected');
             oldSelectedItem.classList.add('cselect-item');
             oldSelectedItem.removeAttribute('id');
-
             newSelectedItem.classList.add('cselect-item-selected');
             newSelectedItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + newSelectedItem.dataset.idNumber);
 
+            // Close the drop down list.
             const itemContainer = document.getElementById('cselect-item-container-' + cselectId);
             itemContainer.style.display = 'none';
 
@@ -171,6 +192,9 @@ const C_Select = (function() {
             select.options[newSelectedItem.dataset.idNumber].setAttribute('selected', 'selected');
         }
 
+        /*
+         * Updates the selection in a multiple drop down list.
+         */
         function updateSelectedMultiple(cselectId, newSelectedItem) {
             // Update the selection in the actual select multiple.
             const select = getSelect(newSelectedItem);

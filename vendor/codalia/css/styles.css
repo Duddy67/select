@@ -1,6 +1,6 @@
 
 .cselect {
-    /*display: none !important;*/
+    display: none !important;*
 }
 
 .cselect-container {
@@ -12,9 +12,14 @@
     background-color: #f1f1f1;
     padding: 8px 16px;
     border-radius: 4px;
+    cursor: pointer;
 }
 
-.cselect-selection:after {
+.cselect-multiple {
+    min-height: 40px;
+}
+
+.cselect-selector:after {
     content: '';
     float: right;
     margin-top: 15px;
