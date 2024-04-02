@@ -82,6 +82,7 @@ const C_Select = (function() {
                 itemContainer.setAttribute('class', 'cselect-item-container');
                 itemContainer.setAttribute('id', 'cselect-item-container-' + cselectId);
 
+                // Create and insert the search input into the item container.
                 const search = document.createElement('input');
                 search.setAttribute('class', 'cselect-search');
                 search.setAttribute('id', 'cselect-search-' + cselectId);
@@ -111,6 +112,16 @@ const C_Select = (function() {
 
                     // Set the selected value and close the dropdown when an option item is clicked
                     optionItem.addEventListener('click', function() {
+
+                        // First clear the cuurent search (if any).
+                        search.value = '';
+                        const items = itemContainer.childNodes;
+
+                        for (let i = 0; i < items.length; i++) {
+                            // Display again the possible item options hidden during the search. 
+                            items[i].removeAttribute('style');
+                        }
+
                         // Don't treat the items already selected.
                         if (this.classList.contains('cselect-item-selected')) {
                             return;
@@ -128,7 +139,7 @@ const C_Select = (function() {
 
                 cselect.appendChild(itemContainer);
 
-                // Filter option items based on user input.
+                // Filter option items based on user input (search).
                 search.addEventListener('input', function() {
                     const filter = this.value.toUpperCase();
 
@@ -143,6 +154,7 @@ const C_Select = (function() {
 
                         const itemText = items[i].innerHTML.toUpperCase();
 
+                        // Compare the text to the user input and hide the item accordingly.
                         if (itemText.indexOf(filter) > -1) {
                             items[i].style.display = '';
                         }

@@ -30,9 +30,18 @@
     border-top-color: #000;
 }
 
+.cselect-search {
+    width: -webkit-fill-available;
+    margin: 5px;
+    border: 1px solid #b0b6bb;
+    border-radius: 4px;
+}
+
 .cselect-item-container {
     border-top: 1px solid #ced4da;
     display: none;
+    overflow-y: auto;
+    max-height: 400px;
 }
 
 .cselect-item-container div {
