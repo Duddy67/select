@@ -21,8 +21,17 @@ const C_Select = (function() {
             if (evt.target.classList.contains('cselect-button-close')) {
                 // Get the button from the button closure span.
                 const button = document.getElementById('cselect-button-' + evt.target.dataset.idNumber);
-                // Get the cselect id from the cselect container (ie: the parent's parent of the button).
-                const cselectId = button.parentElement.parentElement.dataset.idNumber;
+
+                // Get the cselect container (ie: the parent's parent of the button).
+                const cselect = button.parentElement.parentElement;
+
+                // Check if the select is disabled.
+                if (cselect.classList.contains('cselect-disabled')) {
+                    return;
+                }
+
+                // Get the cselect id from the cselect container.
+                const cselectId = cselect.dataset.idNumber;
 
                 // Set the attribute and class of the unselected item.
                 const unselectedItem = document.getElementById('cselect-item-selected-' + cselectId + '-' + evt.target.dataset.idNumber);
@@ -48,10 +57,18 @@ const C_Select = (function() {
                 // Build the CSelect drop down list container.
                 const cselect = document.createElement('div');
                 cselect.setAttribute('class', 'cselect-container');
-                cselect.setAttribute('id', 'cselect-container-' + cselectId);
+                cselect.setAttribute('id', 'cselect-' + cselectId);
                 // The name of the actual select.
                 cselect.setAttribute('data-select-name', select.name);
                 cselect.setAttribute('data-id-number', cselectId);
+
+                // Add the id of the newly created CSelect element to the actual select.
+                select.setAttribute('data-cselect-id', 'cselect-' + cselectId);
+
+                // Check if the actual select is disabled.
+                if (select.disabled) {
+                    cselect.setAttribute('class', 'cselect-disabled');
+                }
 
                 // Build the selection area.
                 const selection = document.createElement('div');
@@ -106,14 +123,18 @@ const C_Select = (function() {
                         optionItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + j);
                     }
 
+                    // Check if the option is disabled.
+                    if (select.options[j].disabled) {
+                        optionItem.setAttribute('class', 'cselect-item-disabled');
+                    }
+
                     const text = document.createTextNode(select.options[j].text);
                     optionItem.appendChild(text);
                     itemContainer.appendChild(optionItem);
 
                     // Set the selected value and close the dropdown when an option item is clicked
                     optionItem.addEventListener('click', function() {
-
-                        // First clear the cuurent search (if any).
+                        // First clear the current search (if any).
                         search.value = '';
                         const items = itemContainer.childNodes;
 
@@ -122,8 +143,8 @@ const C_Select = (function() {
                             items[i].removeAttribute('style');
                         }
 
-                        // Don't treat the items already selected.
-                        if (this.classList.contains('cselect-item-selected')) {
+                        // Don't treat the items already selected or disabled.
+                        if (this.classList.contains('cselect-item-selected') || this.classList.contains('cselect-item-disabled')) {
                             return;
                         }
 
@@ -166,6 +187,11 @@ const C_Select = (function() {
 
                 // Toggle the dropdown when the selection is clicked
                 selection.addEventListener('click', function() {
+                    // Don't open the list when the select is disabled.
+                    if (cselect.classList.contains('cselect-disabled')) {
+                        return;
+                    }
+
                     if (itemContainer.style.display === 'block') {
                         itemContainer.style.display = 'none';
                     }

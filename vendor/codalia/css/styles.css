@@ -1,11 +1,37 @@
 
 .cselect {
-    display: none !important;*
+    display: none !important;
 }
 
 .cselect-container {
     border: 1px solid #ced4da;
     border-radius: 4px;
+}
+
+.cselect-disabled {
+    color: #999999;
+}
+
+.cselect-disabled .cselect-selection {
+    cursor: default !important;
+}
+
+.cselect-disabled .cselect-button {
+    cursor: default !important;
+}
+
+.cselect-disabled .cselect-button-close {
+    border-right: 1px solid #999999 !important;
+}
+
+.cselect-disabled .cselect-selector:after {
+    border-top-color: #878787 !important;
+}
+
+.cselect-item-disabled {
+    color: #999999;
+    background-color: #efefef;
+    cursor: default !important;
 }
 
 .cselect-selection {
