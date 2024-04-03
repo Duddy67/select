@@ -14,13 +14,18 @@ const C_Select = (function() {
         }
 
         document.addEventListener('click', function(evt) {
-            // Close the dropdown if the user clicks outside of it
+            // Don't close the drop down list when selected or disabled items are clicked.
+            if (evt.target.classList.contains('cselect-item-selected') || evt.target.classList.contains('cselect-item-disabled')) {
+                return;
+            }
+
+            // Close the drop down list if the user clicks outside of it
             closeAllLists(evt.target);
 
             // Check for button closure in a multiple drop down list. 
             if (evt.target.classList.contains('cselect-button-close')) {
-                // Get the button from the button closure span.
-                const button = document.getElementById('cselect-button-' + evt.target.dataset.idNumber);
+                // Get the button (the closure span parent).
+                const button = evt.target.parentElement;
 
                 // Get the cselect container (ie: the parent's parent of the button).
                 const cselect = button.parentElement.parentElement;
@@ -34,14 +39,14 @@ const C_Select = (function() {
                 const cselectId = cselect.dataset.idNumber;
 
                 // Set the attribute and class of the unselected item.
-                const unselectedItem = document.getElementById('cselect-item-selected-' + cselectId + '-' + evt.target.dataset.idNumber);
+                const unselectedItem = document.getElementById('cselect-item-selected-' + cselectId + '-' + button.dataset.idNumber);
                 unselectedItem.classList.remove('cselect-item-selected');
                 unselectedItem.classList.add('cselect-item');
                 unselectedItem.removeAttribute('id');
 
                 // Unselect the corresponding option in the actual select.
                 const select = getSelect(button);
-                select.querySelector('option[value=' + evt.target.dataset.value + ']').removeAttribute('selected');
+                select.querySelector('option[value=' + button.dataset.value + ']').removeAttribute('selected');
 
                 // Then remove the button from the selected area.
                 button.remove();
@@ -155,6 +160,9 @@ const C_Select = (function() {
                         else {
                             updateSelected(cselectId, this);
                         }
+
+                        // Close the drop down list.
+                        itemContainer.style.display = 'none';
                     });
                 }
 
@@ -185,7 +193,7 @@ const C_Select = (function() {
                     }
                 });
 
-                // Toggle the dropdown when the selection is clicked
+                // Toggle the drop down list when the selection is clicked
                 selection.addEventListener('click', function() {
                     // Don't open the list when the select is disabled.
                     if (cselect.classList.contains('cselect-disabled')) {
@@ -213,6 +221,8 @@ const C_Select = (function() {
             const buttonItem = document.createElement('div');
             buttonItem.setAttribute('class', 'cselect-button');
             buttonItem.setAttribute('id', 'cselect-button-' + idNumber);
+            buttonItem.setAttribute('data-id-number', idNumber);
+            buttonItem.setAttribute('data-value', select.options[idNumber].value);
 
             // Create the button label.
             const label = document.createElement('span');
@@ -223,8 +233,6 @@ const C_Select = (function() {
             // Create the button closure.
             const close = document.createElement('span');
             close.setAttribute('class', 'cselect-button-close');
-            close.setAttribute('data-id-number', idNumber);
-            close.setAttribute('data-value', select.options[idNumber].value);
             text = document.createTextNode('x');
             close.appendChild(text);
             buttonItem.appendChild(close);
@@ -249,10 +257,6 @@ const C_Select = (function() {
             oldSelectedItem.removeAttribute('id');
             newSelectedItem.classList.add('cselect-item-selected');
             newSelectedItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + newSelectedItem.dataset.idNumber);
-
-            // Close the drop down list.
-            const itemContainer = document.getElementById('cselect-item-container-' + cselectId);
-            itemContainer.style.display = 'none';
 
             // Update the selected option in the actual select.
             const select = getSelect(newSelectedItem);
