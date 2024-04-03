@@ -223,6 +223,7 @@ const C_Select = (function() {
             buttonItem.setAttribute('id', 'cselect-button-' + idNumber);
             buttonItem.setAttribute('data-id-number', idNumber);
             buttonItem.setAttribute('data-value', select.options[idNumber].value);
+            buttonItem.setAttribute('data-cselect-id', select.dataset.cselectId);
 
             // Create the button label.
             const label = document.createElement('span');
