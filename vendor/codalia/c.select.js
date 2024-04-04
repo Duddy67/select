@@ -123,7 +123,7 @@ const C_Select = (function() {
 
                     // Check for selected options.
                     if (select.options[j].selected) {
-                        optionItem.setAttribute('class', 'cselect-item-selected');
+                        optionItem.classList.add('cselect-item-selected');
                         // Use 2 ids in case of multiple select.
                         optionItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + j);
                     }
@@ -254,7 +254,6 @@ const C_Select = (function() {
 
             const oldSelectedItem = document.querySelectorAll('[id^="cselect-item-selected-'+ cselectId +'"]')[0];
             oldSelectedItem.classList.remove('cselect-item-selected');
-            oldSelectedItem.classList.add('cselect-item');
             oldSelectedItem.removeAttribute('id');
             newSelectedItem.classList.add('cselect-item-selected');
             newSelectedItem.setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + newSelectedItem.dataset.idNumber);
@@ -285,7 +284,6 @@ const C_Select = (function() {
             for (let i = 0; i < items.length; i++) {
                 // Set the attributes of the newly selected item.
                 if (items[i].dataset.idNumber == newSelectedItem.dataset.idNumber) {
-                    items[i].classList.remove('cselect-item');
                     items[i].classList.add('cselect-item-selected');
                     items[i].setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + newSelectedItem.dataset.idNumber);
                 }

@@ -92,12 +92,20 @@
             </div>
             <div class="row">
                 <div class="col-md-6 form-group mb-3">
-                    <label for="shakes">Shakes</label>
-                    <select id="shakes" class="form-select cselect" name="shakes[]" multiple>
-                        <option value="vanilla">Vanilla Shake</option>
-                        <option value="strawberry" selected="selected">Strawberry Shake</option>
-                        <option value="chocolate">Chocolate Shake</option>
-                        <option value="cherry" selected>Cherry Shake</option>
+                    <label for="instruments">Instruments (multiple)</label>
+                    <select id="instruments" class="form-select cselect" name="instruments[]" multiple>
+                        <option value="guitar">Guitar</option>
+                        <option value="piano">Piano</option>
+                        <option value="flute">Flute</option>
+                        <option value="violin">Violin</option>
+                        <option value="cello">Cello</option>
+                        <option value="harmonica">Harmonica</option>
+                        <option value="drums">Drums</option>
+                        <option value="congas">Congas</option>
+                        <option value="accordion">Accordion</option>
+                        <option value="saxophone">Saxophone</option>
+                        <option value="trumpet">Trumpet</option>
+                        <option value="contrabass">Contrabass</option>
                     </select>
                 </div>
             </div>
@@ -113,6 +121,18 @@
                     </select>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="shakes">Shakes (multiple with main item)</label>
+                    <select id="shakes" class="form-select cselect" name="shakes[]" multiple>
+                        <option value="vanilla">Vanilla Shake</option>
+                        <option value="strawberry" selected="selected">Strawberry Shake</option>
+                        <option value="chocolate">Chocolate Shake</option>
+                        <option value="cherry" selected>Cherry Shake</option>
+                    </select>
+                </div>
+            </div>
+            <input type="hidden" id="mainItem" value="cherry">
         </form>
     </div>
 

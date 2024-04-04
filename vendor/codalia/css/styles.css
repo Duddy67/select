@@ -106,3 +106,8 @@
     padding: 5px;
     border-right: 1px solid black;
 }
+
+.cselect-main-item {
+    background: #aeecff;
+}
+
