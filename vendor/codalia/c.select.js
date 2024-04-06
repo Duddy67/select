@@ -54,6 +54,8 @@ const C_Select = (function() {
         });
     });
 
+    // Private functions.
+
     /*
      * Create a CSelect drop down list.
      */
@@ -362,11 +364,11 @@ const C_Select = (function() {
         return parseInt(newIdNumber) + 1;
     }
 
-    function bar() {
-        console.log('bar');
-    }
 
+    // Function used as constructor.
     const _CSelect = function() {};
+
+    // Public functions.
 
     _CSelect.prototype = {
         setCSelect: function(select) {
@@ -376,8 +378,17 @@ const C_Select = (function() {
             }
 
             createCSelect(select);
-        }
+        },
 
+        rebuildCSelect: function(select) {
+            const cselect = document.getElementById(select.dataset.cselectId);
+            const idNumber = cselect.dataset.idNumber;
+
+            // Remove the current CSelect item.
+            cselect.remove();
+
+            createCSelect(select, idNumber);
+        }
     };
 
     return {

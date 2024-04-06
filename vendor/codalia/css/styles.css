@@ -8,8 +8,9 @@
     border-radius: 4px;
 }
 
-.cselect-disabled {
+.cselect-disabled .cselect-selection {
     color: #999999;
+    background-color: #f1f1f1;
 }
 
 .cselect-disabled .cselect-selection {
@@ -35,7 +36,6 @@
 }
 
 .cselect-selection {
-    background-color: #f1f1f1;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
