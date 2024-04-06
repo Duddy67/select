@@ -50,6 +50,11 @@ const C_Select = (function() {
 
                 // Then remove the button from the selected area.
                 button.remove();
+
+                // Trigger a change event.
+                // Note: Use var instead of const or a "Cannot access before initialization" error will be raised.
+                var evt = new Event('change', {'bubbles': true});
+                select.dispatchEvent(evt);
             }
         });
     });
@@ -268,6 +273,10 @@ const C_Select = (function() {
         const select = getSelect(newSelectedItem);
         select.options[select.selectedIndex].removeAttribute('selected');
         select.options[newSelectedItem.dataset.idNumber].setAttribute('selected', 'selected');
+
+        // Trigger a change event.
+        const evt = new Event('change', {'bubbles': true});
+        select.dispatchEvent(evt);
     }
 
     /*
@@ -294,6 +303,10 @@ const C_Select = (function() {
                 items[i].setAttribute('id', 'cselect-item-selected-' + cselectId + '-' + newSelectedItem.dataset.idNumber);
             }
         }
+
+        // Trigger a change event.
+        const evt = new Event('change', {'bubbles': true});
+        select.dispatchEvent(evt);
     }
 
     /*

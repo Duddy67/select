@@ -32,4 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Rebuild a new CSelect item for the modified drop down list.
     cselect.rebuildCSelect(cars);
+
+    // The change event is triggered.
+    document.addEventListener('change', function(evt) {
+        console.log(evt.target.getAttribute('name'));
+    });
 });
