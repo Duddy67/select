@@ -21,8 +21,18 @@
     cursor: default !important;
 }
 
+.cselect-button-disabled {
+    color: #999999;
+    background-color: #f1f1f1;
+    cursor: default !important;
+}
+
+.cselect-button-disabled .cselect-button-close {
+    border-right: 1px solid #999999;
+}
+
 .cselect-disabled .cselect-button-close {
-    border-right: 1px solid #999999 !important;
+    border-right: 1px solid #999999;
 }
 
 .cselect-disabled .cselect-selector:after {

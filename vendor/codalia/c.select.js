@@ -26,16 +26,18 @@ const C_Select = (function() {
             if (evt.target.classList.contains('cselect-button-close')) {
                 // Get the button (the closure span parent).
                 const button = evt.target.parentElement;
+                // Get the actual select.
+                const select = getSelect(button);
+
+                // Check first if the actual select or the corresponding option of the button is disabled.
+                if (select.disabled || select.options[button.dataset.idNumber].disabled) {
+                    return;
+                }
 
                 // Get the cselect container (ie: the parent's parent of the button).
                 const cselect = button.parentElement.parentElement;
 
-                // Check if the select is disabled.
-                if (cselect.classList.contains('cselect-disabled')) {
-                    return;
-                }
-
-                // Get the cselect id from the cselect container.
+                // Get the cselect id number from the cselect container.
                 const cselectId = cselect.dataset.idNumber;
 
                 // Set the attribute and class of the unselected item.
@@ -45,15 +47,7 @@ const C_Select = (function() {
                 unselectedItem.removeAttribute('id');
 
                 // Unselect the corresponding option in the actual select.
-                const select = getSelect(button);
-
-                // Note: Do not use querySelector here as it generates random error ('option[value=1' is not a valid selector).
-
-                for (let i = 0; i < select.options.length; i++) {
-                    if (select.options[i].value == button.dataset.value) {
-                        select.options[i].selected = false;
-                    }
-                }
+                select.options[button.dataset.idNumber].removeAttribute('selected');
 
                 // Then remove the button from the selected area.
                 button.remove();
@@ -242,6 +236,10 @@ const C_Select = (function() {
         buttonItem.setAttribute('data-id-number', idNumber);
         buttonItem.setAttribute('data-value', select.options[idNumber].value);
         buttonItem.setAttribute('data-cselect-id', select.dataset.cselectId);
+
+        if (select.options[idNumber].disabled) {
+            buttonItem.classList.add('cselect-button-disabled');
+        }
 
         // Create the button label.
         const label = document.createElement('span');

@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // A label button has been clicked.
         if (evt.target.tagName == 'SPAN' && evt.target.classList.contains('cselect-button-label')) {
             const clickedButton = evt.target.parentElement;
+
+            // Do not set a disabled item as main item.
+            if (clickedButton.classList.contains('cselect-button-disabled')) {
+                return;
+            }
+
             const cselect = document.getElementById(clickedButton.dataset.cselectId);
 
             // Make sure the option item is part of the CSelect shake drop down list.
@@ -64,9 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 // The closed button was set as main item.
                 if (closedButton.classList.contains('cselect-main-item')) {
                     // Set the next button in the selection area as main item.
-                    const newMainShakeButton = selection.firstChild;
-                    document.getElementById('mainItem').value = newMainShakeButton.dataset.value;
-                    newMainShakeButton.classList.add('cselect-main-item');
+                    for (let i = 0; i < selection.childNodes.length; i++) {
+                        // Make sure a disabled item is not set as main item.
+                        if (!selection.childNodes[i].classList.contains('cselect-button-disabled')) {
+                            document.getElementById('mainItem').value = selection.childNodes[i].dataset.value;
+                            selection.childNodes[i].classList.add('cselect-main-item');
+                            // Quit as only one button must be set as main item.
+                            return;
+                        }
+
+                    }
                 }
             }
         }
@@ -81,10 +94,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cselect.dataset.selectName == 'shakes[]') {
                 const selection = cselect.firstChild;
 
-                // The newly selected option item is the only one in the selection area.
-                if (selection.children.length == 1) {
+                let button = null;
+                let isMainItem = true;
+
+                // Loop through the buttons in the selection area.
+                for (let i = 0; i < selection.childNodes.length; i++) {
+                    // Get the button corresponding to the newly selected option item.
+                    if (selection.childNodes[i].dataset.value == optionItem.dataset.value) {
+                        button = selection.childNodes[i];
+                        continue;
+                    }
+
+                    // Another option item is already set as main item.
+                    if (selection.childNodes[i].classList.contains('cselect-main-item')) {
+                        isMainItem = false;
+                    }
+                }
+
+                if (isMainItem) {
                     // Set the selected option as the main item.
-                    const button = selection.firstChild;
                     button.classList.add('cselect-main-item');
                     document.getElementById('mainItem').value = button.dataset.value;
                 }
