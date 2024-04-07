@@ -46,7 +46,14 @@ const C_Select = (function() {
 
                 // Unselect the corresponding option in the actual select.
                 const select = getSelect(button);
-                select.querySelector('option[value=' + button.dataset.value + ']').removeAttribute('selected');
+
+                // Note: Do not use querySelector here as it generates random error ('option[value=1' is not a valid selector).
+
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value == button.dataset.value) {
+                        select.options[i].selected = false;
+                    }
+                }
 
                 // Then remove the button from the selected area.
                 button.remove();
