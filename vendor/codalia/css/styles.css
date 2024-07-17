@@ -104,6 +104,14 @@
     cursor: default !important;
 }
 
+.cselect-upward {
+    bottom: 40px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
 .cselect-button {
     display: inline-block;
     background: #d6d6d6;
